@@ -1,0 +1,76 @@
+name: fact-check
+
+# Checks the claims a PR adds to the skills against docs/versioned-facts.md,
+# its upstream oracles, the sources linked in the PR description and the
+# canonical set (the ZIPs, THS/Zakura source, z.cash/learn, the
+# zcash.readthedocs.io search API, zodl-inc code search), then posts the result
+# as a PR comment.
+#
+# Trust boundary. pull_request_target, so the comment can be posted on PRs
+# from forks; that runs with this repository's token, so only the base branch
+# is checked out and run. The PR's diff and description are fetched through
+# the API and are only ever data: each added line is a claim to check or an
+# inert string in the report. Verdicts come from the base branch's
+# versioned-facts.md. Lines the PR adds to that file, including fact
+# definitions (pattern/upstream/extract/...), are checked as claims and left
+# for a reviewer; they take effect once merged. Every fetch is https to an
+# allowlisted host (FETCH_HOSTS in docs/check-facts.py).
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
+    paths:
+      - "SKILL.md"
+      - "skills/**"
+      - "docs/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write # the comment goes through /issues/{n}/comments
+
+concurrency:
+  group: fact-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR: ${{ github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Read the PR as data
+        run: |
+          gh pr diff "$PR" -R "$GITHUB_REPOSITORY" > "$RUNNER_TEMP/pr.diff"
+          gh pr view "$PR" -R "$GITHUB_REPOSITORY" --json body -q .body > "$RUNNER_TEMP/body.md"
+
+      - name: Verify changed claims
+        id: verify
+        run: |
+          set +e
+          python3 docs/verify-claims.py --diff "$RUNNER_TEMP/pr.diff" --body "$RUNNER_TEMP/body.md" \
+            --report "$RUNNER_TEMP/report.md" > /dev/null
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Post or update the PR comment
+        run: |
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+            --jq '[.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- zcash-skills-fact-check -->")))][0].id // empty')
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F "body=@$RUNNER_TEMP/report.md" > /dev/null
+          else
+            gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -F "body=@$RUNNER_TEMP/report.md" > /dev/null
+          fi
+
+      - name: Fail on contradictions
+        if: steps.verify.outputs.status != '0'
+        run: |
+          echo "::error::Changed lines contradict docs/versioned-facts.md or its upstream sources; see the PR comment."
+          exit 1

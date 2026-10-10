@@ -55,12 +55,20 @@ needed): every match of the pattern is then a stale-claim failure — use this
 for "X does not exist / X is not required" statements that upstream has since
 made false.
 
+A block can also name its oracle: `upstream` is a raw URL of the file that
+states the value, and `extract` is a regex whose first group captures it.
+`python3 docs/check-facts.py --upstream` compares every oracle with `value`, and
+the PR fact check uses the same oracles for the lines a PR changes. Prefer an
+oracle whenever the value lives in a parseable upstream file.
+
 ```facts
 id: zakura-image
 value: zakuracore/zakura:1.6.0
 pattern: zakuracore/zakura:[0-9a-zA-Z.\-]+
 verified: 2026-10-02
 source: crates/ths-cli/src/runtime.rs (ZAKURA_IMAGE)
+upstream: https://raw.githubusercontent.com/zcashlabs/thus-spoke-zakura/main/crates/ths-cli/src/runtime.rs
+extract: const ZAKURA_IMAGE: &str = "([^"]+)"
 ```
 
 ```facts
@@ -69,14 +77,56 @@ value: Rust 1.98.0
 pattern: Rust 1\.[0-9]+\.[0-9]+|rust-toolchain[^;\n]*1\.[0-9]+\.[0-9]+
 verified: 2026-10-02
 source: rust-toolchain.toml
+upstream: https://raw.githubusercontent.com/zcashlabs/thus-spoke-zakura/main/rust-toolchain.toml
+extract: ^channel = "([^"]+)"
 ```
 
 ```facts
 id: nu7-testnet-height
 value: 4,465,026
-pattern: 4,?465,?026|NU7[^\n]{0,40}Testnet[^\n]{0,40}[0-9]{6,}
+pattern: 4,?465,?026|NU7[^\n]{0,40}Testnet[^\n]{0,40}[0-9][0-9,]{5,}[0-9]
 verified: 2026-10-06
 source: ZIP 259
+upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0259.md
+extract: ^ACTIVATION_HEIGHT \(NU7\)\n: Testnet: ([0-9]+)
+```
+
+```facts
+id: nu7-branch-id
+value: 0x77190AD9
+pattern: 0x77190AD9
+verified: 2026-10-09
+source: ZIP 259
+upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0259.md
+extract: ^CONSENSUS_BRANCH_ID\n: `?(0x[0-9A-Fa-f]{8})
+```
+
+```facts
+id: nu63-branch-id
+value: 0x37A5165B
+pattern: 0x37A5165B
+verified: 2026-10-09
+source: ZIP 258
+upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0258.md
+extract: ^CONSENSUS_BRANCH_ID\n: `?(0x[0-9A-Fa-f]{8})
+```
+
+```facts
+id: nu63-mainnet-height
+value: 3,428,143
+verified: 2026-10-09
+source: ZIP 258
+upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0258.md
+extract: ^ACTIVATION_HEIGHT \(NU6\.3\)\n: Testnet: [0-9]+\n: Mainnet: ([0-9]+)
+```
+
+```facts
+id: ths-workspace-version
+value: 0.3.0
+verified: 2026-10-09
+source: Cargo.toml ([workspace.package])
+upstream: https://raw.githubusercontent.com/zcashlabs/thus-spoke-zakura/main/Cargo.toml
+extract: ^\[workspace\.package\]\n(?:.*\n)*?version = "([^"]+)"
 ```
 
 ```facts

@@ -16,7 +16,7 @@ files = sorted(
     os.path.relpath(os.path.join(dirpath, name), ROOT)
     for dirpath, _, names in os.walk(ROOT)
     for name in names
-    if name.endswith(".md") and ".git" not in os.path.relpath(dirpath, ROOT).split(os.sep)
+    if name.endswith(".md") and not any(part.startswith(".") and part != "." for part in os.path.relpath(dirpath, ROOT).split(os.sep))
 )
 
 html = open(INDEX).read()
