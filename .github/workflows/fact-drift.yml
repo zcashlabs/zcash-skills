@@ -1,0 +1,68 @@
+name: fact-drift
+
+# Nightly: run check-facts.py --upstream so oracle drift — an upstream file
+# that moved, a 404, or a value that no longer matches — files an issue
+# instead of going unnoticed. PR/push checks stay offline; this job is the
+# one place upstream is compared on a schedule. Hard contradictions mark the
+# run failed; fetch/extract problems also fail it as incomplete verification.
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: compare facts against upstream oracles
+        id: check
+        run: |
+          set +e
+          python3 docs/check-facts.py --upstream > "$RUNNER_TEMP/drift.txt" 2>&1
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          echo "warns=$(grep -c '^WARN' "$RUNNER_TEMP/drift.txt" || true)" >> "$GITHUB_OUTPUT"
+          cat "$RUNNER_TEMP/drift.txt"
+
+      - name: file or update a drift issue
+        if: steps.check.outputs.status != '0' || steps.check.outputs.warns != '0'
+        run: |
+          issue=$(gh issue list -R "$GITHUB_REPOSITORY" --state open \
+            --search '"fact-drift" in:title' --json number --jq '.[0].number // empty')
+          {
+            echo "check-facts.py --upstream on $(date -u +%F):"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/drift.txt"
+            echo '```'
+          } > "$RUNNER_TEMP/drift-issue.md"
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" -R "$GITHUB_REPOSITORY" -F "$RUNNER_TEMP/drift-issue.md" > /dev/null
+          else
+            gh issue create -R "$GITHUB_REPOSITORY" \
+              --title "fix(fact-drift): upstream drift or incomplete verification" \
+              -F "$RUNNER_TEMP/drift-issue.md" > /dev/null
+          fi
+
+      - name: fail on contradictions or incomplete verification
+        if: steps.check.outputs.status != '0'
+        env:
+          CHECK_STATUS: ${{ steps.check.outputs.status }}
+        run: |
+          if [ "$CHECK_STATUS" = '2' ]; then
+            echo '::error::Upstream verification is incomplete; inspect the failed fetch or extraction.'
+          else
+            echo '::error::Fact checking failed; inspect the drift report.'
+          fi
+          exit 1

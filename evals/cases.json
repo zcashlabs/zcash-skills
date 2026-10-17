@@ -1,0 +1,194 @@
+{
+  "source_repository": "https://github.com/zcashlabs/thus-spoke-zakura",
+  "source_revision": "6b00d0f0e40ecd42f61ca046485a03b69c5f3338",
+  "tasks": [
+    {
+      "id": "foreign-resource",
+      "skills": [
+        "ths-runtime"
+      ],
+      "prompt": "In Thus Spoke Zakura, `ths --name alpha start` fails because a pre-existing Docker volume has the expected instance name but no THS ownership label. A teammate proposes deleting every resource with the `ths-alpha` prefix, then retrying cleanup from Drop if initial deletion fails. Review that proposal against this checkout. Trace the production startup and cleanup owners, explain the safe behavior, and specify regression evidence for initial failure, partial allocation, and a same-name replacement. Investigate source and tests; do not change code or run Docker/Cargo. Cite file paths and symbols and distinguish observed source evidence from tests you propose to run.",
+      "checks": {
+        "ownership": "Rejects prefix-only deletion; requires the instance ownership label plus recorded identity checks so a same-name replacement is preserved. Cites resources.rs and cleanup.rs production logic.",
+        "startup": "Traces production start/own_start/start_owned in runtime/startup.rs; correctly says the cleanup guard is inactive until initial cleanup is verified and an initial failure is not retried on Drop.",
+        "failure_oracles": "Names tests or concrete assertions for foreign resources, initial cleanup failure, and partial allocation; asserts preserved foreign ID/data and no new allocation after initial refusal.",
+        "evidence_limits": "Distinguishes RecordingHost/RecordingDocker seam coverage from a disposable real-Docker collision check; does not claim a live run or treat delete call counts as proof of ownership."
+      },
+      "oracle_paths": [
+        "crates/ths-cli/src/runtime/startup.rs",
+        "crates/ths-cli/src/runtime/resources.rs",
+        "crates/ths-cli/src/runtime/cleanup.rs",
+        "crates/ths-cli/tests/unit/runtime/tests/resources.rs",
+        "crates/ths-cli/tests/unit/runtime/tests/startup.rs"
+      ]
+    },
+    {
+      "id": "faucet-lost-response",
+      "skills": [
+        "ths-wallet-server"
+      ],
+      "prompt": "A THS client submits an external-address faucet request, loses the HTTP response, and retries after the server restarts. The original transaction may already have been broadcast. A teammate suggests a fresh idempotency key and points to execute_address_faucet as the production workflow. Investigate this checkout and give a safe recovery recommendation. Trace HTTP acceptance, durable state, background work, saved transaction recovery, and confirmation. Explain what to check before preparing a replacement and how you would prove that a retry pays once. Do not change code or run Docker/Cargo. Cite the actual production symbols and relevant tests; separate observations from proposed validation.",
+      "checks": {
+        "replay_identity": "Retains the same key/address/amount, rejects changed intent and cross-endpoint key reuse, and distinguishes external address_faucets rows from internal-account activities.",
+        "production_path": "Finds api/payments.rs::faucet_address -> db/address_faucet.rs::claim_address_faucet -> payments/progression.rs worker -> submission.rs -> confirmation.rs; identifies execute_address_faucet as test-only.",
+        "original_transaction": "Checks original txid presence/inclusion and saved server/wallet journal data before retransmission or replacement; requires verified absence and expiry before a fresh proposal. Does not infer failure from timeout.",
+        "recovery_oracle": "Specifies same operation/txid identity and one chain effect across restart, confirmed block and durable row evidence; names progression/persistence tests or the exact live restart scenario and acknowledges it was not run. HTTP acceptance alone is not confirmation."
+      },
+      "oracle_paths": [
+        "crates/ths-server/src/api/payments.rs",
+        "crates/ths-server/src/db/address_faucet.rs",
+        "crates/ths-server/src/payments/progression.rs",
+        "crates/ths-server/src/payments/submission.rs",
+        "crates/ths-server/src/payments/confirmation.rs",
+        "crates/ths-server/src/wallet/journal.rs",
+        "crates/ths-server/tests/activity_recovery.rs"
+      ]
+    },
+    {
+      "id": "stale-wallet-balance",
+      "skills": [
+        "ths-dashboard",
+        "ths-wallet-server"
+      ],
+      "prompt": "After mining on a THS instance, the dashboard still shows the old wallet balance while /api/v1/health returns 200. Server source was edited immediately before this container was launched. A teammate proposes recomputing balances from explorer transactions into React state, or resetting wallet data if that fails. Investigate this checkout and produce a diagnostic procedure with precise observations that separate the running artifact, server sync/snapshot, and browser cache boundaries. Identify the source owners and regression tests you would use. Do not change code, run Docker/Cargo/npm, or claim live behavior you have not observed.",
+      "checks": {
+        "artifact": "Checks the running instance/image and edited source; explains that ths uses prebuilt images and source edits need build --dev plus a new instance, while a Vite dev frontend alone does not update the server.",
+        "snapshot": "Compares status and accounts with scanned/observed heights AND hashes; explains health 200 can coexist with stale/error sync and identifies sync.rs checkpoint-gated snapshot publication. Keeps the last good snapshot and investigates failure before destructive reset.",
+        "ui_boundary": "Keeps the server wallet snapshot authoritative, rejects rebuilding balances from explorer/activity or mirroring query data, and distinguishes API-stale from UI-stale using useAccounts/query keys and the actual useServerEvents topic mapping.",
+        "validation": "Proposes concrete pre-publication failure and mounted-query/refetch assertions with nearby tests; checks same-height hash divergence; separates source inspection, unit tests, and rebuilt live-stack evidence."
+      },
+      "oracle_paths": [
+        "crates/ths-server/src/sync.rs",
+        "crates/ths-server/src/api/status.rs",
+        "crates/ths-server/tests/unit/sync/tests.rs",
+        "crates/ths-server/tests/unit/state/tests.rs",
+        "web/src/hooks/queries.ts",
+        "web/src/hooks/useServerEvents.ts",
+        "web/src/hooks/useServerEvents.test.tsx"
+      ]
+    }
+  ],
+  "triggers": [
+    {
+      "id": "route-01",
+      "prompt": "Review THS cleanup after partial Docker startup; a same-name volume belongs to another instance.",
+      "required": [
+        "ths-runtime"
+      ],
+      "allowed": [
+        "ths-runtime",
+        "ths",
+        "ths-regtest-verifier"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-02",
+      "prompt": "In ths-server, an external-address faucet retry after restart must not pay twice. Inspect its durable operation state.",
+      "required": [
+        "ths-wallet-server"
+      ],
+      "allowed": [
+        "ths-wallet-server",
+        "ths",
+        "ths-regtest-verifier",
+        "zcash-payments"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-03",
+      "prompt": "The Thus Spoke Zakura React wallet balance stays stale after an SSE event. Inspect the query hooks and invalidation.",
+      "required": [
+        "ths-dashboard"
+      ],
+      "allowed": [
+        "ths-dashboard",
+        "ths",
+        "ths-wallet-server"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-04",
+      "prompt": "Our Zcash wallet parser accepts a ZIP 321 URI with an unknown req-* parameter. Review required-parameter rejection.",
+      "required": [
+        "zcash-wallet"
+      ],
+      "allowed": [
+        "zcash-wallet",
+        "zcash",
+        "zcash-payments"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-05",
+      "prompt": "Our Zcash payment broadcast timed out. Should we create a replacement transaction before checking the original txid?",
+      "required": [
+        "zcash-payments"
+      ],
+      "allowed": [
+        "zcash-payments",
+        "zcash",
+        "zcash-light-client"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-06",
+      "prompt": "A Zcash light client sees a new block hash at the same scanned height. Review common-ancestor rewind and rescan.",
+      "required": [
+        "zcash-light-client"
+      ],
+      "allowed": [
+        "zcash-light-client",
+        "zcash",
+        "zcash-protocol"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-07",
+      "prompt": "A generic Docker Compose Postgres volume collides by name. Explain Docker labels; this project has no Zcash or THS integration.",
+      "required": [],
+      "allowed": [],
+      "kind": "near-miss"
+    },
+    {
+      "id": "route-08",
+      "prompt": "Our municipal water-faucet inventory API returns duplicate hardware records. This is a plumbing catalogue, with no cryptocurrency payments.",
+      "required": [],
+      "allowed": [],
+      "kind": "near-miss"
+    },
+    {
+      "id": "route-09",
+      "prompt": "Fix stale TanStack Query data in a weather dashboard after SSE reconnect. It has no Zcash, wallet, or THS components.",
+      "required": [],
+      "allowed": [],
+      "kind": "near-miss"
+    },
+    {
+      "id": "route-10",
+      "prompt": "Draw a wallet icon for a CSS-only landing page. No blockchain integration or payment behavior is involved.",
+      "required": [],
+      "allowed": [],
+      "kind": "near-miss"
+    },
+    {
+      "id": "route-11",
+      "prompt": "A Stripe card checkout timed out. Review payment retry deduplication in this ecommerce app; it does not use cryptocurrency.",
+      "required": [],
+      "allowed": [],
+      "kind": "near-miss"
+    },
+    {
+      "id": "route-12",
+      "prompt": "A Git branch changed commit hash without changing its file count. Explain how to find a common ancestor, with no blockchain work.",
+      "required": [],
+      "allowed": [],
+      "kind": "near-miss"
+    }
+  ]
+}
