@@ -23,6 +23,7 @@ For each cross-layer request, write down the user-visible result, the layer that
 | Consensus rules, transaction formats, activation, node validation | [zcash-protocol](../zcash-protocol/SKILL.md) |
 | Sprout-pool funds, `z_setmigration`/`z_getmigrationstatus`, old zcashd wallets | [sprout-rescue](../sprout-rescue/SKILL.md) |
 | JavaScript/TypeScript apps using the `@zcashlabs/zcash.js` SDK | [zcashjs](../zcashjs/SKILL.md) |
+| Indexed mainnet history and aggregates no node serves: pool balances over time, swaps, node versions | [shieldedscan](../shieldedscan/SKILL.md) |
 | Zakura node operation, zcashd-compat mode, pruning/snapshots, Regtest infra | [zakura](../zakura/SKILL.md) |
 | Work inside the Thus Spoke Zakura repo or its `ths` CLI | [ths](../ths/SKILL.md) |
 
