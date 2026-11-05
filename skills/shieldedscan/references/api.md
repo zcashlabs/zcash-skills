@@ -43,7 +43,7 @@ The catalogue states them under `conventions`; the ones that change how an answe
 
 ## Rate limits
 
-Published under `rateLimit` in the catalogue: per-address burst and sustained limits, a ceiling
+Published under `rateLimit` in the catalogue: per-IP burst and sustained limits, a ceiling
 shared by every caller, and tighter limits for windowed analytics. A refusal is a 429 with
 `Retry-After`. Honour it, cache responses (they carry `Cache-Control`), and do not poll an
 endpoint faster than its data changes.
