@@ -32,7 +32,7 @@ cf = vc.check_facts  # one copy, so both modules share UpstreamError
 
 FACTS = [
     {"id": "zakura-image", "value": "zakuracore/zakura:1.6.0", "pattern": r"zakuracore/zakura:[0-9a-zA-Z.\-]+",
-     "upstream": "https://raw.githubusercontent.com/o/r/main/runtime.rs", "extract": r'const ZAKURA_IMAGE: &str = "([^"]+)"'},
+     "upstream": "https://raw.githubusercontent.com/zcash/r/main/runtime.rs", "extract": r'const ZAKURA_IMAGE: &str = "([^"]+)"'},
     {"id": "faucet", "kind": "forbid", "pattern": r"faucet has no idempotency", "source": "api.rs"},
     {"id": "zip317", "kind": "forbid", "negation": "true", "pattern": r"ZIPs? ?317[^\n]{0,50}\bconsensus\b", "source": "ZIP 317"},
     {"id": "ths-version", "value": "ths 0.3.0", "pattern": r"ths \d+\.\d+\.\d+"},
@@ -250,13 +250,26 @@ class TrustBoundaryTests(unittest.TestCase):
 
 class HostAllowlistTests(unittest.TestCase):
     def test_host_allowed(self):
-        self.assertTrue(cf.host_allowed("https://raw.githubusercontent.com/a/b/main/c.rs"))
+        self.assertTrue(cf.host_allowed("https://raw.githubusercontent.com/zcash/zips/main/zip-0001.rst"))
         self.assertTrue(cf.host_allowed("https://api.github.com/search/code?q=x"))
-        for url in ("http://raw.githubusercontent.com/a", "https://evil.example/", "https://raw.githubusercontent.com:8443/a",
-                    "https://raw.githubusercontent.com@evil.example/a", "https://user@zips.z.cash/", "https://zips.z.cash:bad/",
+        for url in ("http://raw.githubusercontent.com/zcash/zips", "https://evil.example/", "https://raw.githubusercontent.com:8443/zcash/zips",
+                    "https://raw.githubusercontent.com@evil.example/zcash/zips", "https://user@zips.z.cash/", "https://zips.z.cash:bad/",
                     "file:///etc/passwd", "https://z.cash.evil.example/"):
             self.assertFalse(cf.host_allowed(url), url)
         self.assertFalse(cf.host_allowed("https://api.github.com/x", cf.ORACLE_HOSTS))
+
+    def test_github_owner_allowlist(self):
+        # An allowed host is not enough: the repo owner must be official.
+        for url in ("https://github.com/attacker/planted/blob/main/evidence.md",
+                    "https://raw.githubusercontent.com/attacker/planted/main/evidence.md",
+                    "https://codeload.github.com/attacker/planted/tar.gz/main",
+                    "https://github.com/ZCASHLABS-lookalike/x/blob/main/a.md"):
+            self.assertFalse(cf.host_allowed(url), url)
+        for url in ("https://github.com/zcashlabs/thus-spoke-zakura/blob/main/Cargo.toml",
+                    "https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0259.md",
+                    "https://codeload.github.com/zcashfoundation/zebra/tar.gz/main",
+                    "https://raw.githubusercontent.com/ZODL-inc/zcash-docs/main/x.md"):
+            self.assertTrue(cf.host_allowed(url), url)
 
     def test_fetch_refuses_hosts_off_the_allowlist_without_connecting(self):
         with self.assertRaises(cf.HostNotAllowed):
@@ -272,7 +285,7 @@ class HostAllowlistTests(unittest.TestCase):
         handler = cf._AllowlistRedirects()
         req = urllib.request.Request("https://api.github.com/search/code?q=x")
         req.add_unredirected_header("Authorization", "Bearer t")
-        new = handler.redirect_request(req, None, 302, "Found", {}, "https://raw.githubusercontent.com/a")
+        new = handler.redirect_request(req, None, 302, "Found", {}, "https://raw.githubusercontent.com/zcash/x")
         self.assertIsNone(new.get_header("Authorization"))
 
     def test_upstream_value_refuses_disallowed_oracles(self):
@@ -284,7 +297,8 @@ class HostAllowlistTests(unittest.TestCase):
     def test_check_facts_rejects_bad_oracle_definitions(self):
         self.assertEqual(cf.definition_errors({"id": "a", "value": "1"}), [])
         self.assertIn("no `extract`", cf.definition_errors({"id": "a", "upstream": "https://zips.z.cash/x"})[0])
-        self.assertIn("not https on an allowed host", cf.definition_errors({"id": "a", "upstream": "https://evil.example/x", "extract": "(.)"})[0])
+        self.assertIn("not an allowed source", cf.definition_errors({"id": "a", "upstream": "https://evil.example/x", "extract": "(.)"})[0])
+        self.assertIn("not an allowed source", cf.definition_errors({"id": "a", "upstream": "https://github.com/attacker/x/blob/main/y.md", "extract": "(.)"})[0])
         self.assertEqual(cf.definition_errors({"id": "a", "value": "1", "upstream": "https://zips.z.cash/x", "extract": "(.)"}), [])
 
     def test_disallowed_pr_source_is_listed_not_fetched(self):
@@ -606,7 +620,7 @@ class CheckFactsTests(unittest.TestCase):
 
     def test_set_oracle_detects_added_removed_and_renamed_ci_cases(self):
         fact = {"id": "ci-cases", "value": "first_case, second_case", "extract_all": "true",
-                "upstream": "https://raw.githubusercontent.com/o/r/main/ci.yml",
+                "upstream": "https://raw.githubusercontent.com/zcash/r/main/ci.yml",
                 "extract": r"--exact\s+(\w+)", "coverage": r"^.*--ignored\b.*$"}
         for commands, expected in (("second_case first_case", True), ("first_case", False),
                                    ("first_case second_case third_case", False), ("first_case renamed_case", False)):
@@ -662,7 +676,7 @@ class CheckFactsTests(unittest.TestCase):
         self.assertFalse(cf.value_in_hit({"value": "zakuracore/zakura:1.6.0"}, "zakuracore/zakura:1.6"))
 
     def test_extract_failure_is_a_distinct_upstream_error(self):
-        fact = {"id": "x", "value": "v", "upstream": "https://raw.githubusercontent.com/o/r/main/f.rs",
+        fact = {"id": "x", "value": "v", "upstream": "https://raw.githubusercontent.com/zcash/r/main/f.rs",
                 "extract": r"WANT = (\d+)"}
         with self.assertRaises(cf.ExtractError):
             cf.upstream_value(fact, fetch=lambda url: "nothing here")

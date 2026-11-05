@@ -52,6 +52,31 @@ ORACLE_HOSTS = frozenset({
 # GitHub's tarball and search endpoints that verify-claims.py calls itself.
 FETCH_HOSTS = ORACLE_HOSTS | {"codeload.github.com", "api.github.com"}
 
+# A github.com link alone is not evidence — anyone can publish a repo under
+# their own account. GitHub-family URLs only count as sources when the repo
+# owner is an official Zcash org. api.github.com is not listed: its /repos/OWNER
+# and /search paths don't carry the owner in the first segment, and it only
+# serves the tool's own calls, never an evidence link.
+GITHUB_OWNER_HOSTS = frozenset({
+    "github.com",
+    "raw.githubusercontent.com",
+    "codeload.github.com",
+})
+GITHUB_SOURCE_OWNERS = frozenset({
+    "zcash",
+    "zcashfoundation",
+    "zcashlabs",
+    "zakura-core",
+    "zodl-inc",
+    "electric-coin-company",
+})
+
+
+def github_owner_allowed(url, owners=GITHUB_SOURCE_OWNERS):
+    """True when a GitHub-family URL's repo owner is an official org."""
+    first = urllib.parse.urlparse(url).path.lstrip("/").split("/", 1)[0]
+    return first.lower() in owners
+
 
 class UpstreamError(Exception):
     """The oracle could not be read: fetch failed or `extract` found nothing."""
@@ -72,7 +97,11 @@ def host_allowed(url, hosts=FETCH_HOSTS):
         port = parsed.port
     except ValueError:  # a malformed port or netloc
         return False
-    return parsed.scheme == "https" and (parsed.hostname or "") in hosts and port in (None, 443) and parsed.username is None
+    if not (parsed.scheme == "https" and (parsed.hostname or "") in hosts and port in (None, 443) and parsed.username is None):
+        return False
+    if parsed.hostname in GITHUB_OWNER_HOSTS:
+        return github_owner_allowed(url)
+    return True
 
 
 class _AllowlistRedirects(urllib.request.HTTPRedirectHandler):
@@ -230,7 +259,7 @@ def definition_errors(fact):
     if fact.get("extract_all", "false") not in ("true", "false"):
         return [f"{fact['id']} extract_all must be true or false"]
     if not oracle_allowed(fact):
-        return [f"{fact['id']} upstream {fact['upstream']} is not https on an allowed host ({', '.join(sorted(ORACLE_HOSTS))})"]
+        return [f"{fact['id']} upstream {fact['upstream']} is not an allowed source — needs https on {', '.join(sorted(ORACLE_HOSTS))} and, for GitHub URLs, a repo owner in {', '.join(sorted(GITHUB_SOURCE_OWNERS))}"]
     if "value" not in fact:
         return [f"{fact['id']} upstream oracle needs a value"]
     return []
