@@ -73,6 +73,14 @@ The `@zcashlabs/zcash.js` TypeScript SDK for Node and browsers.
 - Persistent wallet storage is Linux-only today; browsers need gRPC-Web + CORS
   plus deployed lazy WASM/worker/proving assets.
 
+### [shieldedscan](skills/shieldedscan/SKILL.md)
+Indexed mainnet data from the ShieldedScan explorer (keyless REST API and MCP server).
+- For history and aggregates a node does not serve; tip, blocks and raw
+  transactions are node truth. An explorer response is evidence, not settlement.
+- Read `GET /v1` for endpoints and rate limits at use time; amounts are integer
+  zatoshis; `null` is unknown with a reason in `unknowns`, never zero.
+- Shielded amounts and recipients are private: never attribute them to anyone.
+
 ### [sprout-rescue](skills/sprout-rescue/SKILL.md)
 The zcashd Sprout→Sapling migration tool (`z_setmigration` since 2.0.5-2).
 - Never handle wallet.dat, seeds, keys, or passphrases — the user types

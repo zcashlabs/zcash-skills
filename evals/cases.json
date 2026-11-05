@@ -250,6 +250,51 @@
         "zcash-wallet"
       ],
       "kind": "positive"
+    },
+    {
+      "id": "route-18",
+      "prompt": "How much ZEC left the Sapling pool over the last 30 days? Give the daily balances and say where the figures come from.",
+      "required": [
+        "shieldedscan"
+      ],
+      "allowed": [
+        "shieldedscan",
+        "zcash"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-19",
+      "prompt": "Write a script that alerts us when a cross-chain swap into ZEC worth more than $10,000 happens. We do not run a Zcash node.",
+      "required": [
+        "shieldedscan"
+      ],
+      "allowed": [
+        "shieldedscan",
+        "zcash",
+        "zcashjs"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-20",
+      "prompt": "Which Zakura and Zebra versions are mainnet nodes running right now, and how many of each?",
+      "required": [
+        "shieldedscan"
+      ],
+      "allowed": [
+        "shieldedscan",
+        "zcash",
+        "zakura"
+      ],
+      "kind": "positive"
+    },
+    {
+      "id": "route-21",
+      "prompt": "Our Ethereum block explorer shows stale token balances on address pages. Fix the indexer's cache invalidation; nothing here involves Zcash.",
+      "required": [],
+      "allowed": [],
+      "kind": "near-miss"
     }
   ]
 }
