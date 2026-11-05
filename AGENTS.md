@@ -52,7 +52,10 @@ There is no build. Before committing, verify:
 - `python3 -m unittest discover -s tests` passes if you touched `docs/*.py`.
 
 On a PR, list the upstream files, ZIPs or docs pages behind your changes under
-`Source(s) of truth:` in the description. The `fact-check` workflow checks every
+`Source(s) of truth:` in the description. GitHub sources must live under an
+official org (`GITHUB_SOURCE_OWNERS` in `docs/check-facts.py`) — a random
+user's repo is not evidence, so the bot will list but never fetch it. The
+`fact-check` workflow checks every
 added line against them, the base branch's facts file and its oracles, and the
 canonical set (the ZIPs, THS/Zakura source, z.cash/learn, the readthedocs
 search API, zodl-inc code search), then comments with the result; only a

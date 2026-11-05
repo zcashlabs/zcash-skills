@@ -84,6 +84,9 @@ states the value, and `extract` is a regex whose first group captures it.
 exact normalised equality, and the PR fact check uses the same oracles for the
 lines a PR changes. Prefer an oracle whenever the value lives in a parseable
 upstream file — this works for `.rst` ZIP sources as well as `.md`.
+`upstream` must point at an allowed host, and GitHub URLs only count when the
+repo owner is an official org — see `ORACLE_HOSTS`/`GITHUB_SOURCE_OWNERS` in
+`docs/check-facts.py`.
 
 For unordered source lists, set `extract_all: true`: every first capture is
 collected into a comma-separated set and compared without regard to order. Use

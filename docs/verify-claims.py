@@ -31,7 +31,8 @@ failures only ever produce ⚠️.
 
 Everything taken from the PR (diff, description, file paths) is either a claim
 to check or an inert string. None of it is run or compiled as a regex, and
-every fetch is https to a host in check_facts.FETCH_HOSTS.
+every fetch is https to a host in check_facts.FETCH_HOSTS; on GitHub-family
+hosts the repo owner must be an official org (check_facts.GITHUB_SOURCE_OWNERS).
 
 Exit 1 only when there is a contradiction. Standard library only.
 """
@@ -59,8 +60,8 @@ MARKER = "<!-- zcash-skills-fact-check -->"
 COMMENT_LIMIT = 60_000
 FACTS_PATH = "docs/versioned-facts.md"
 
-# Author-supplied links on these hosts are fetched; others are listed in the
-# report but not fetched.
+# Author-supplied links on these hosts are fetched — and on GitHub-family hosts
+# only when the repo owner is official; others are listed but not fetched.
 ALLOWED_HOSTS = check_facts.ORACLE_HOSTS
 CANONICAL_REPOS = [
     ("zcashlabs/thus-spoke-zakura", "main"),
@@ -697,7 +698,7 @@ def render(results, provided, sources):
     if provided:
         listed = []
         for url, fetchable, body in provided:
-            state = "fetched" if body is not None else ("not fetched: only GitHub file links and the Zcash docs/ZIP sites are read" if fetchable is None else "fetch failed")
+            state = "fetched" if body is not None else ("not fetched: only file links from official Zcash orgs on GitHub and the Zcash docs/ZIP sites are read" if fetchable is None else "fetch failed")
             listed.append((link(cell(url, 80), url) if body is not None else cell(url, 80)) + f" ({state})")
         out.append("Sources from the PR description: " + ", ".join(listed) + ".")
     else:
