@@ -4,6 +4,9 @@
     python3 docs/verify-claims.py --base origin/add-initial-skills
     python3 docs/verify-claims.py --diff pr.diff --body pr-body.md --report out.md
 
+On macOS with python.org or Homebrew Python, prefix SSL_CERT_FILE=/etc/ssl/cert.pem;
+otherwise every fetch fails and every claim is left unverified.
+
 Every added line in `SKILL.md`, `skills/**/*.md` or `docs/versioned-facts.md`
 is a claim. Its checkable values are numbers of four or more digits, versions,
 hex IDs and backticked names. Each claim goes through three steps:

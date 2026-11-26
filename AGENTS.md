@@ -48,7 +48,10 @@ There is no build. Before committing, verify:
 - versioned claims (heights, image tags, crate versions) match
   `docs/versioned-facts.md` — `python3 docs/check-facts.py` must pass
   (`--upstream` also compares each fact with its upstream oracle; the nightly
-  `fact-drift` workflow runs it and files an issue on drift);
+  `fact-drift` workflow runs it and files an issue on drift). On macOS with
+  python.org or Homebrew Python, run it as
+  `SSL_CERT_FILE=/etc/ssl/cert.pem python3 docs/check-facts.py --upstream`;
+  otherwise every fetch fails and the run exits 2 ("incomplete");
 - `python3 -m unittest discover -s tests` passes if you touched `docs/*.py`.
 
 On a PR, list the upstream files, ZIPs or docs pages behind your changes under
@@ -62,4 +65,4 @@ search API, zodl-inc code search), then comments with the result; only a
 contradiction fails it. Lines you add to `docs/versioned-facts.md` are checked
 as claims and reviewed by hand; they take effect once merged. Run it locally
 with `python3 docs/verify-claims.py --base <base-branch>` (set `GITHUB_TOKEN`
-to include code search).
+to include code search; on macOS prefix the same `SSL_CERT_FILE=/etc/ssl/cert.pem`).

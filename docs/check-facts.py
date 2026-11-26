@@ -21,6 +21,9 @@ A fetch or extraction that fails leaves verification incomplete. An `upstream`
 must be an https URL on ORACLE_HOSTS; other hosts are never fetched.
 
 Run from anywhere:  python3 docs/check-facts.py [--upstream]
+On macOS with python.org or Homebrew Python, run --upstream as
+SSL_CERT_FILE=/etc/ssl/cert.pem python3 docs/check-facts.py --upstream;
+otherwise every fetch fails and the run exits 2 ("incomplete").
 Exit 0 = requested checks completed without contradictions (date warnings may remain);
 exit 1 = contradictions or invalid definitions; exit 2 = incomplete upstream verification.
 Without --upstream, exit 0 establishes local consistency only.
