@@ -16,7 +16,7 @@
 | Self-update and uninstall | `crates/ths-cli/src/updater.rs`, `install.sh` |
 | Source-built app and lightwalletd images | `Dockerfile`, `docker/lightwalletd.Dockerfile` |
 
-Map checked against THS main at `c0edfb0585aa868504fa5e5ce330e58df59de8e1` on 2026-10-19. Paths without a crate prefix in a row are siblings of that row's first file. Resolve the actual checked-out symbols before editing; this map is navigation, not a substitute for reading the full function and its callers. A CLI request may cross into `ths-server` over HTTP, so inspect both ends of a changed command.
+Map checked against THS main at `c0edfb0585aa868504fa5e5ce330e58df59de8e1` on 2026-10-19. THS v0.5.0 later made a native runtime the default (`ths`, `start`, `run`, and `doctor` run without Docker; `start --docker` selects the Docker runtime), so this Docker-era map does not cover the native path: locate its owners in the checkout before editing. Paths without a crate prefix in a row are siblings of that row's first file. Resolve the actual checked-out symbols before editing; this map is navigation, not a substitute for reading the full function and its callers. A CLI request may cross into `ths-server` over HTTP, so inspect both ends of a changed command.
 
 ## Command surface
 
@@ -45,7 +45,7 @@ If `ths status --json` shows a URL that does not respond, compare the live app c
 
 ## Source versus running artifact
 
-`ths` uses images, not edited source files. After server or web changes, `cargo run -p thus-spoke-zakura -- build --dev` builds local images for the next launch. Start a new named instance from the rebuilt images; a running container still has its existing image. Preserve the old instance's failure evidence and identify the image and instance actually exercised before claiming a live result. `cargo run -p thus-spoke-zakura -- <args>` invokes the source launcher; the package name is not `ths`.
+`ths` uses prebuilt Docker images or native bundles, not edited source files. After server or web changes, `cargo run -p thus-spoke-zakura -- build --dev` builds local images for the next launch. Start a new named instance from the rebuilt images with `start --docker` (without `--docker`, `start` uses a native bundle, which a source build must be given with `--runtime-dir`); a running container still has its existing image. Preserve the old instance's failure evidence and identify the image and instance actually exercised before claiming a live result. `cargo run -p thus-spoke-zakura -- <args>` invokes the source launcher; the package name is not `ths`.
 
 `THS_DEV_API=<dashboard-url> npm run dev --prefix web` serves the edited frontend through Vite and proxies `/api` to the existing instance (`web/vite.config.ts`). Obtain that URL from `ths endpoints`. This frontend-only mode does not update `ths-server`; edited server code still needs the image rebuild and new-instance workflow above.
 
@@ -77,3 +77,11 @@ cargo fmt --all -- --check
 ```
 
 The searches locate production entry points and nearby regression tests; follow their callers and helpers to find every affected reuse or removal branch. The Cargo test is a fast local gate; run the full `AGENTS.md` Rust checks after changing `crates/` and use a disposable Docker daemon for the collision oracle.
+
+## Sources
+
+Last verified: 2026-11-26, for the runtime-mode and wallet-crate statements only; the source map keeps its own checked date.
+
+- THS `AGENTS.md`: "`ths` runs prebuilt Docker images or native bundles"; rebuild with `build --dev`, then `start --docker`
+- THS `CHANGELOG.md` v0.5.0: native runtime by default, Zakura Common 4.0.0, backend/SQLite 0.1.0-rc9.4, `--nu7-height`
+- THS `crates/ths-server/Cargo.toml`

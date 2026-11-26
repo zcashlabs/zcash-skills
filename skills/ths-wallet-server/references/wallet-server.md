@@ -21,7 +21,7 @@
 
 Map checked against THS main at `c0edfb0585aa868504fa5e5ce330e58df59de8e1` on 2026-10-19. Paths without a crate prefix in a row are relative to `crates/ths-server/src/`. Re-resolve symbols in the target checkout and distinguish production callers from `#[cfg(test)]` adapters.
 
-Inspect `Cargo.toml` and `crates/ths-server/Cargo.toml` before using upstream wallet documentation. This repository imports Zakura wallet crates (`zakura-keys`, `zakura-primitives`, `zakura-client-backend`, `zakura-client-sqlite`, `zakura-proofs`, `zakura-orchard`, `zakura-sapling-crypto`, `zakura-pczt`, `zakura-transparent`, `zakura-zip321`) under `zcash_*` aliases at exact-pinned versions. API semantics and compatibility claims must follow the resolved source.
+Inspect `Cargo.toml` and `crates/ths-server/Cargo.toml` before using upstream wallet documentation. This repository imports Zakura wallet crates (`zakura-keys`, `zakura-primitives` with its `pczt` feature, `zakura-client-backend`, `zakura-client-sqlite`, `zakura-proofs`, `zakura-orchard`, `zakura-sapling-crypto`, `zakura-transparent`, `zakura-zip321`) under `zcash_*` aliases at exact-pinned versions. API semantics and compatibility claims must follow the resolved source.
 
 The wallet database keeps legacy `ext_tsz_*` schema names and migration UUIDs on purpose — see the migrations in `wallet/journal.rs` and `wallet/recovery.rs`. Keep them stable for existing wallets when following the `tsz-*` → `ths-*` crate rename elsewhere.
 
@@ -29,7 +29,7 @@ The wallet database keeps legacy `ext_tsz_*` schema names and migration UUIDs on
 
 The path is Zakura checkpoint → lightwalletd indexed data → wallet database → `sync.rs::refresh_wallet_snapshot_until` → `api/status.rs::accounts` → `web/src/hooks/queries.ts::useAccounts`, which binds `queryKeys.accounts` to `api.accounts` → `WalletPage`. `synchronize_wallet_until` holds the sync lock, checks a shared deadline, runs `reconcile::sync_wallet`, then publishes the snapshot. `scan_is_publishable` checks scanned, target, and observed checkpoints, including canonical hash evidence when the chain has advanced. Failures before publication leave the earlier account snapshot in place. Payment progression runs separately in `payments/progression.rs`; do not assume activity reconciliation is a step inside snapshot publication.
 
-Before attributing a stale balance to that path, verify the running artifact. After server edits, run `cargo run -p thus-spoke-zakura -- build --dev` and launch a new named instance; the existing container retains its original image. Preserve its wallet store and failure evidence. `THS_DEV_API=<dashboard-url> npm run dev --prefix web` only serves the edited frontend with API requests proxied to the existing server. It does not rebuild or replace server code. If raw accounts are current but the page is stale, use the dashboard's [balance diagnosis](../../ths-dashboard/references/dashboard.md#stale-balance-diagnosis) to inspect that exact accounts query and `wallet` event.
+Before attributing a stale balance to that path, verify the running artifact. After server edits, run `cargo run -p thus-spoke-zakura -- build --dev` and launch a new named instance with `start --docker`; the existing container retains its original image. Preserve its wallet store and failure evidence. `THS_DEV_API=<dashboard-url> npm run dev --prefix web` only serves the edited frontend with API requests proxied to the existing server. It does not rebuild or replace server code. If raw accounts are current but the page is stale, use the dashboard's [balance diagnosis](../../ths-dashboard/references/dashboard.md#stale-balance-diagnosis) to inspect that exact accounts query and `wallet` event.
 
 At startup, `bootstrap.rs::serve` binds HTTP while background startup continues. `start_and_sync` checks dependencies, synchronizes, and provisions Account 1 with 5 Ironwood ZEC before marking the server started and entering the wallet sync loop. `/api/v1/health` in `api/status.rs` can return 200 with a prior successful sync even if the current wallet-sync state is `error`; runtime readiness probes this route. For a stale balance after startup, compare `/api/v1/status` wallet-sync state and scanned/observed height **and hash**, then `/api/v1/accounts`. A green health check establishes less than a current, ready wallet snapshot. `reconcile.rs::within_deadline` applies per-operation and shared sync deadlines, so locate the phase that timed out.
 
@@ -101,3 +101,11 @@ cargo test -p ths-server payments::progression::tests
 ```
 
 Test both an account faucet replay and the address endpoint — they share the idempotency key space, and the same key is rejected across `activities` and `address_faucets`.
+
+## Sources
+
+Last verified: 2026-11-26, for the runtime-mode and wallet-crate statements only; the source map keeps its own checked date.
+
+- THS `AGENTS.md`: "`ths` runs prebuilt Docker images or native bundles"; rebuild with `build --dev`, then `start --docker`
+- THS `CHANGELOG.md` v0.5.0: native runtime by default, Zakura Common 4.0.0, backend/SQLite 0.1.0-rc9.4, `--nu7-height`
+- THS `crates/ths-server/Cargo.toml`

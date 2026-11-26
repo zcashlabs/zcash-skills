@@ -1,6 +1,6 @@
 # Zcash JS (`@zcashlabs/zcash.js`)
 
-Map checked against zcashjs `v0.1.1` (`de75201`, 2026-10-26). The package is an experimental prerelease: re-resolve every symbol and default below against the installed version's `src/index.ts`, `src/types.ts`, and `docs/api/` before asserting it. Anything under `docs/planning/` or `docs/research/` is a plan, not shipped API.
+Map checked against zcashjs `v0.1.4` on 2026-11-26 for install, defaults, networks, storage, and limits; other rows were written at `0.1.1` (`de75201`, 2026-10-26). The package is an experimental prerelease: re-resolve every symbol and default below against the installed version's `src/index.ts`, `src/types.ts`, and `docs/api/` before asserting it. Anything under `docs/planning/` or `docs/research/` is a plan, not shipped API.
 
 ## Where behavior lives
 
@@ -25,7 +25,7 @@ The [API reference](https://zcashlabs.github.io/zcashjs/api/reference.html) grou
 
 ## Install and runtime
 
-- `npm install @zcashlabs/zcash.js` — engine-pinned to Node `22.23.4` (`package.json` `engines`; 0.1.1 pins it for the Brotli security update). ESM only (`"type": "module"`); TypeScript projects use `"module": "NodeNext"`.
+- `npm install @zcashlabs/zcash.js` — engine-pinned to Node `22.23.4` (`package.json` `engines`; pinned since 0.1.1 for the Brotli security update). ESM only (`"type": "module"`); TypeScript projects use `"module": "NodeNext"`.
 - One package carries the wallet engine, workers, and local proving assets — no separate runtime package, Rust toolchain, or post-install download.
 - It is an **experimental prerelease**: assume any specific behavior below drifted until checked.
 
@@ -44,7 +44,7 @@ The [API reference](https://zcashlabs.github.io/zcashjs/api/reference.html) grou
 
 ## Clients and transports
 
-- **Networks:** `defineNetwork()` selects mainnet; `'testnet'` explicit. Presets carry genesis hash + activation schedule through NU6.3 (matching bundled `zcash_protocol` 0.10.6). Mismatch fails rather than switching chains. Custom networks call `defineNetwork({ identity, genesisHash, ...encodeNetworkParameters(params) })` — `encoding` plus every activation height Overwinter→Nu6_3, nondecreasing or `null`, all required. `readGenesisHash(transport)` discovers genesis only — it does not authenticate the endpoint; for a known chain, supply the configured hash.
+- **Networks:** `defineNetwork()` selects mainnet; `'testnet'` explicit. Presets carry genesis hash + activation schedule through NU7 (mainnet 3543405, testnet 4465026) as version-2 parameter documents since 0.1.4; upgrades through NU6.3 match bundled `zcash_protocol` 0.10.6, which leaves NU7 unset. A wallet database created with an earlier preset fails to open with `NETWORK_MISMATCH` (see `CHANGELOG.md`). Mismatch fails rather than switching chains. Custom networks call `defineNetwork({ identity, genesisHash, ...encodeNetworkParameters(params) })` — `encoding` plus every activation height Overwinter→Nu6_3, nondecreasing or `null`, all required; an explicit `Nu7` field selects version 2 of the document. `readGenesisHash(transport)` discovers genesis only — it does not authenticate the endpoint; for a known chain, supply the configured hash.
 - **Amounts/IDs:** `parseZec`/`formatZec` keep bigint zatoshis (1 ZEC = 10⁸); `txId`/`blockHash` validate display-order hex; `accountIndex`/`diversifierIndex` are typed validators. Pool names are `transparent`, `sapling`, `ironwood` — `orchard` is not selectable.
 - **Public client:** `createPublicClient(rpcUrl)` (30 s/attempt, two read attempts 500 ms apart, 4 MiB, label `public-rpc`) for `getTip`, `getBlock`/`getBlockHeader` (exactly one of `{height}`/`{hash}`), `getTransaction`, `getTransactionStatus`, `getUtxos` (transparent), tree/subtree reads, `watchTransaction`/`waitForTransaction`, `broadcastTransaction`. Credential-bearing URLs are rejected — use the `headers` callback.
 - **Light client:** `createLightClient(endpoint, { network })` — lazy handshake validating chain label, Sapling height, branch ID, genesis, protocol revision. Node gets native gRPC; browsers need gRPC-Web + CORS. Regtest accepts `regtest` or the BIP70 `test` label Zakura/Zaino send. Streams (`streamCompactBlocks`, `streamAddressTransactions`, `streamMempool`) are inclusive ranges; stop a long one with an `AbortController` or `break` the loop — never pull the same iterator concurrently.
@@ -78,7 +78,7 @@ The [API reference](https://zcashlabs.github.io/zcashjs/api/reference.html) grou
 
 ## Limits and security
 
-Explicitly unqualified or absent at v0.1.1 — check `platforms.md` before promising: persistent storage outside Linux; historical database migration; the complete live-browser send/receive round trip; managed artifact hosting; a persistent secret vault; a database backup API; remote proving; hardware signer integration. Storage is not advertised as encrypted at rest; there is a documented closed-wallet `flock` backup procedure on Linux only (`operations.md`).
+Explicitly unqualified or absent at v0.1.4 — check `platforms.md` before promising: persistent storage outside Linux; historical database migration; the complete live-browser send/receive round trip; managed artifact hosting; a persistent secret vault; a database backup API; remote proving; hardware signer integration. Node filesystem storage can be encrypted at rest with an application-supplied key; OPFS and memory storage are not encrypted (`platforms.md`). There is a documented closed-wallet `flock` backup procedure on Linux only (`operations.md`).
 
 Privacy posture: keep secrets out of URLs (rejected anyway), logs, telemetry, and browser bundles. Viewing keys, memos, PCZTs, and operation records are sensitive even when they can't spend. Address/UTXO lookups and broadcasts disclose interest to the endpoint; online recovery queries recorded transactions. Default UAs expose all supported receivers including transparent — request shielded receivers explicitly where linking matters. Exported PCZTs are sensitive data.
 
@@ -89,3 +89,11 @@ Privacy posture: keep secrets out of URLs (rejected anyway), logs, telemetry, an
 - "Browser wallet can't fetch" → endpoint speaks native gRPC, not gRPC-Web, or CORS blocks the origin; also verify the bundler deployed the lazy asset directory.
 - "Regtest wallet won't handshake" → check the server's chain label (`regtest`/`test` accepted), Sapling height, branch ID, genesis match, and protocol revision.
 - "Balance shows funds, proposal fails" → spendable inputs ≠ displayed total: confirmations, freshness, pool policy, and fee all gate selection.
+
+## Sources
+
+Last verified: 2026-11-26.
+
+- zcashjs `package.json` (version 0.1.4, `engines.node` 22.23.4), `CHANGELOG.md` 0.1.4
+- `docs/api/networks-amounts.md`: "activation schedules through NU7 (mainnet 3543405, testnet 4465026)"
+- `docs/api/wallet-runtime.md` "Defaults", `docs/api/platforms.md`

@@ -1,6 +1,6 @@
 ---
 name: ths-runtime
-description: Use when changing the Thus Spoke Zakura ths CLI, named Docker instances, service startup or cleanup, images, installation, or local endpoints.
+description: Use when changing the Thus Spoke Zakura ths CLI, named instances (native or Docker), service startup or cleanup, images, installation, or local endpoints.
 ---
 
 # THS runtime
@@ -21,5 +21,5 @@ Preserve Regtest-only behavior, loopback host ports, and instance-scoped cleanup
 ## Review examples
 
 - A same-name Docker resource may belong to someone else; inspect the current deletion path before trusting a cleanup test that only records calls.
-- A server source edit requires a new app image for `ths start`, while the live `activity_recovery` Cargo target runs a source-built server process.
+- A server source edit requires a new app image and `ths start --docker` (the default runtime is native since v0.5.0), while the live `activity_recovery` Cargo target runs a source-built server process.
 - A command or flag change reaches `book/cli.md`, parsed CLI behavior, the affected API call, and the resulting instance state.
