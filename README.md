@@ -2,8 +2,9 @@
 
 Agent skills for building on Zcash — the current stack, not your training data.
 
-Zcash in 2026 is not the Zcash most models learned: `zcashd` is deprecated, the
-Orchard pool was sealed at NU6.3 in favor of Ironwood, and the dev stack is
+Zcash in 2026 is not the Zcash most models learned: `zcashd` is deprecated and
+halted, the Orchard pool was sealed at NU6.3 in favor of Ironwood, NU7 is live
+on Mainnet (25-second blocks, no v4 transactions, Sprout unspendable), and the dev stack is
 Zakura + lightwalletd/Zaino + the `librustzcash`/`zakura-*` crates. [Thus Spoke
 Zakura](https://github.com/zcashlabs/thus-spoke-zakura) runs that stack as a
 disposable Regtest environment with a dashboard, faucet, and development wallet.
@@ -20,10 +21,10 @@ in `references/`.
 | [zcash-light-client](skills/zcash-light-client/SKILL.md) | Compact-block sync, birthdays, commitment trees, reorgs, service boundaries (lightwalletd/Zaino). |
 | [zcash-protocol](skills/zcash-protocol/SKILL.md) | Consensus rules, network-upgrade activation, transaction encodings (v5/v6), proof verification, node validation. |
 | [zcashjs](skills/zcashjs/SKILL.md) | The `@zcashlabs/zcash.js` SDK: public/light clients, local wallets, proposals, send/shield, PCZT signing, recovery on Node and browsers. |
-| [sprout-rescue](skills/sprout-rescue/SKILL.md) | The zcashd Sprout→Sapling migration tool: `z_setmigration`/`z_getmigrationstatus`, cadence and amounts, the transparent-pool exposure tradeoff. |
+| [sprout-rescue](skills/sprout-rescue/SKILL.md) | Sprout holders after NU7 (funds unspendable, keys only in `wallet.dat`), recovery-service scams, and the historical `z_setmigration` tool. |
 | [zakura](skills/zakura/SKILL.md) | The Zakura full node (`zakurad`): install, zcashd-compat mode, pruning/snapshots, Regtest, P2P v2. |
 | [ths](skills/ths/SKILL.md) | Routes work in the [Thus Spoke Zakura](https://github.com/zcashlabs/thus-spoke-zakura) repo — a disposable Zcash Regtest stack. |
-| [ths-runtime](skills/ths-runtime/SKILL.md) | `ths` CLI, named Docker instances, service startup/cleanup, images, installer, endpoints. |
+| [ths-runtime](skills/ths-runtime/SKILL.md) | `ths` CLI, named instances (native or Docker), service startup/cleanup, images, installer, endpoints. |
 | [ths-wallet-server](skills/ths-wallet-server/SKILL.md) | `ths-server` wallet sync, treasury, send/faucet, APIs, activity, persisted state. |
 | [ths-dashboard](skills/ths-dashboard/SKILL.md) | React dashboard, API schemas, query hooks, mutations, SSE updates. |
 | [ths-regtest-verifier](skills/ths-regtest-verifier/SKILL.md) | Live Docker validation: real proofs, mining, recovery, reward history. |
@@ -89,6 +90,19 @@ Primary references:
 - [zakura-core/zakura](https://github.com/zakura-core/zakura) — the Zakura node
 - [zcash.github.io/ironwood](https://zcash.github.io/ironwood/) — the Ironwood
   pool book (NU6.3)
+
+Last verified: 2026-11-26, against these sources for the current-state claims
+above:
+
+- [zcash/zips README.rst](https://github.com/zcash/zips/blob/main/README.rst)
+  "Settled Mainnet Network Upgrade", [ZIP 259](https://zips.z.cash/zip-0259)
+  and [ZIP 2003](https://zips.z.cash/zip-2003): NU7 and Sprout
+- [zcashd end-of-life notice](https://zcash.github.io/zcash/user/end-of-life.html)
+  and [zcashd deprecation page](https://z.cash/support/zcashd-deprecation/)
+- [Zallet book: Migrating from zcashd](https://zcash.github.io/zallet/zcashd/index.html)
+- [zodl.com/about](https://zodl.com/about/): ECC's team formed ZODL
+- [thus-spoke-zakura CHANGELOG](https://github.com/zcashlabs/thus-spoke-zakura/blob/main/CHANGELOG.md)
+  v0.5.0
 
 ## License
 

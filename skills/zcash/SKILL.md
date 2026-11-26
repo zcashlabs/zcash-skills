@@ -9,7 +9,7 @@ Use this skill for Zcash behavior across implementations and languages. First id
 
 Keep these boundaries explicit: the node validates chain state; an indexer or lightwallet service (lightwalletd, Zaino) serves compact data; a wallet scans, tracks spendable state, and constructs transactions; an application owns its user workflow and display. Confirm which layer owns the decision before changing code or claiming a result.
 
-Know the current landscape before citing components. `zcashd` is deprecated: production nodes are [Zebra](https://github.com/ZcashFoundation/zebra) or [Zakura](https://github.com/zakura-core/zakura) (a Zebra fork); the legacy wallet surface moves to [Zallet](https://github.com/zcash/zallet) or zcashd-compat sidecar mode. The wallet stack is `librustzcash` crates or their `zakura-*` forks; ZODL ships the mobile SDKs and apps. Since NU6.3, new shielded value goes to the Ironwood pool and the Orchard pool is spend-only — "Orchard receiver" in a Unified Address resolves to Ironwood for new outputs. Verify any of these before relying on them; the ecosystem moves.
+Know the current landscape before citing components. `zcashd` is deprecated and its End-of-Support halt has shut down every 6.20.0 node: production nodes are [Zebra](https://github.com/ZcashFoundation/zebra) or [Zakura](https://github.com/zakura-core/zakura) (a Zebra fork); the legacy wallet surface moves to [Zallet](https://github.com/zcash/zallet) or zcashd-compat sidecar mode. The wallet stack is `librustzcash` crates or their `zakura-*` forks; ZODL ships the mobile SDKs and apps. Since NU6.3, new shielded value goes to the Ironwood pool and the Orchard pool is spend-only — "Orchard receiver" in a Unified Address resolves to Ironwood for new outputs. NU7 is live on Mainnet: v4 transactions are invalid and Sprout funds cannot be spent. Verify any of these before relying on them; the ecosystem moves.
 
 For each cross-layer request, write down the user-visible result, the layer that decides it, the neighboring layer that supplies evidence, and the state that must survive failure or restart. Trace one real path through those layers before proposing a change. For example, a Unified Address send uses wallet receiver selection, payment proposal and broadcast, then chain scanning to establish inclusion; a node accepting the broadcast does not establish the wallet's final balance.
 
@@ -21,7 +21,7 @@ For each cross-layer request, write down the user-visible result, the layer that
 | Amounts, proposals, fees, privacy of spends, broadcast and inclusion | [zcash-payments](../zcash-payments/SKILL.md) |
 | Light-client sync, birthdays, commitment trees, reorgs, service boundaries | [zcash-light-client](../zcash-light-client/SKILL.md) |
 | Consensus rules, transaction formats, activation, node validation | [zcash-protocol](../zcash-protocol/SKILL.md) |
-| Sprout-pool funds, `z_setmigration`/`z_getmigrationstatus`, old zcashd wallets | [sprout-rescue](../sprout-rescue/SKILL.md) |
+| Sprout-pool funds after NU7, `z_setmigration`/`z_getmigrationstatus` history, old zcashd wallets | [sprout-rescue](../sprout-rescue/SKILL.md) |
 | JavaScript/TypeScript apps using the `@zcashlabs/zcash.js` SDK | [zcashjs](../zcashjs/SKILL.md) |
 | Zakura node operation, zcashd-compat mode, pruning/snapshots, Regtest infra | [zakura](../zakura/SKILL.md) |
 | Work inside the Thus Spoke Zakura repo or its `ths` CLI | [ths](../ths/SKILL.md) |
