@@ -46,7 +46,7 @@ listen=0                    # no inbound P2P
 | ZMQ notifications | Block templates for miners |
 | Local RPC response semantics | DNS seeding and peer discovery |
 
-Four install modes under `--zcashd-compat`:
+Five installer modes under the zcashd-compat profile (`--install-profile zcashd-compat --mode <mode>`):
 
 | Mode | Behavior |
 | --- | --- |
@@ -54,6 +54,9 @@ Four install modes under `--zcashd-compat`:
 | `supervised` | Zakura downloads a hash-pinned `zcashd` and manages it (`[zcashd_compat].manage_zcashd = true`) |
 | `docker-split-containers` | Two `docker run` commands |
 | `docker-supervised` | One supervised container run |
+| `build-from-source` | Validates source trees and toolchains; prints build and start commands |
+
+The sidecar `zcashd` is a separate build with its own tags. Per `docs/zcashd-compat.md`, the v1.3.1 sidecar schedules Mainnet NU7 at height 3,543,405, v1.2.0 supports NU7 on Testnet only, and earlier sidecars do not support NU7. Check the pinned sidecar tag before trusting a compat deployment past NU7.
 
 Do not imply shielded/Ironwood-era wallet features exist on the sidecar — the sidecar's wallet RPC is the legacy transparent + Sapling surface.
 
@@ -84,3 +87,10 @@ Downstream projects pin exact versions and may alias packages (e.g. `zcash_keys 
 ## Useful docs in-repo
 
 `docs/` holds `zcashd-compat.md`, `design/`, `specs/`, `decisions/`, `upstream-sync/`, `verify.md`, `security.md`, `cpu-profiling.md`, and release/runbooks (`pr-node-do-setup.md`, `security-hotfix-release.md`, `header-chain-v1.4-migration.md`). Prefer the doc at the checked-out revision over this summary.
+
+## Sources
+
+Last verified: 2026-11-26 (install modes and sidecar tags).
+
+- `zakura-core/zakura` `README.md` (installer, Docker run, crates.io install)
+- `zakura-core/zakura` `docs/zcashd-compat.md` (mode table; "This release schedules Mainnet NU7 at height 3,543,405")

@@ -5,7 +5,7 @@ description: Use when building Zcash wallet account, seed, key, viewing-authorit
 
 # Zcash wallet
 
-Resolve the target network and the selected wallet library before implementing wallet identity or address behavior. For a JavaScript or TypeScript wallet built on `@zcashlabs/zcash.js`, load [zcashjs](../zcashjs/SKILL.md) for its SDK surface. For a legacy `wallet.dat` holding Sprout funds, load [sprout-rescue](../sprout-rescue/SKILL.md) before touching the wallet.
+Resolve the target network and the selected wallet library before implementing wallet identity or address behavior. For a JavaScript or TypeScript wallet built on `@zcashlabs/zcash.js`, load [zcashjs](../zcashjs/SKILL.md) for its SDK surface. For a legacy `wallet.dat` holding Sprout funds (unspendable since NU7), load [sprout-rescue](../sprout-rescue/SKILL.md) before touching the wallet.
 
 For key authority or account identity, load [the contract and capability boundaries](references/keys-addresses.md#establish-the-contract). For UA receiver selection or TEX destinations, load [address handling](references/keys-addresses.md#handling-an-address). For seed restore or ZIP 321 parsing, load [recovery and requests](references/keys-addresses.md#recovery-and-requests); for an index-0 discovery failure, load [the worked restore task](references/keys-addresses.md#worked-task-restore-an-index-0-transparent-payment). Choose boundary tests from [useful checks](references/keys-addresses.md#useful-checks).
 

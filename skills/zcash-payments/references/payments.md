@@ -20,7 +20,7 @@ The [ZIP 317](https://zips.z.cash/zip-0317) conventional fee is wallet guidance,
 
 For active Revision 0, the [fee calculation](https://zips.z.cash/zip-0317#fee-calculation) is `5,000 × max(2, logical_actions)` zatoshis. One Orchard action therefore has a 10,000-zatoshi conventional fee and three Orchard actions have 15,000. Three Sapling spends plus two Sapling outputs contribute three logical actions, since that pool contributes `max(spends, outputs)`, not their sum. The transparent contribution uses the larger of rounded-up serialized input bytes divided by 150 and output bytes divided by 34; counting addresses alone misses a large script. These examples are a check on the selected wallet policy, not a hard-coded fee rule for a different ZIP revision or pinned SDK.
 
-**Ironwood (Revision 1, enacted at NU6.3):** adds `contribution_Ironwood = nActionsIronwood` — one logical action per Ironwood Action, identical weight to an Orchard Action. So a v6 transaction with two Ironwood Actions has the same conventional fee as a two-Action Orchard transaction (10,000 zatoshis). Orchard and Ironwood contributions are counted separately and summed — a cross-pool tx with one Orchard spend and one Ironwood output is two logical actions, not "one shielded action." Revision 2 (draft, depends on undeployed ZIP 248) adds memo-bundle handling; check which revision the pinned wallet implements.
+**Ironwood (Revision 1, enacted at NU6.3):** adds `contribution_Ironwood = nActionsIronwood` — one logical action per Ironwood Action, identical weight to an Orchard Action. So a v6 transaction with two Ironwood Actions has the same conventional fee as a two-Action Orchard transaction (10,000 zatoshis). Orchard and Ironwood contributions are counted separately and summed — a cross-pool tx with one Orchard spend and one Ironwood output is two logical actions, not "one shielded action." Revision 2 (Proposed, from [ZIP 2009](https://zips.z.cash/zip-2009)) lowers `marginal_fee` from 5,000 to 1,000 zatoshis and raises `weight_ratio_cap` from 4 to 10 from `FEE_REDUCTION_HEIGHT`; check which revision the pinned wallet and node implement.
 
 ### Proposal review in practice
 
@@ -78,3 +78,11 @@ See the [wallet data API](https://zcash.github.io/librustzcash/rustdoc/latest/zc
 | Reorg the including block | Return to an unconfirmed/unknown state and reconcile before replacement |
 
 Assert the node saw at most the one transaction identity and that the wallet did not select inputs for a second payment. If `T` is absent, test the ordinary [ZIP 203](https://zips.z.cash/zip-0203#specification) expiry boundary at `N` and `N+1` and inspect chain history and retained input locks before authorizing a new proposal. “The HTTP call failed” is never the replacement oracle. The [current upstream proposal API](https://zcash.github.io/librustzcash/rustdoc/latest/zcash_client_backend/data_api/wallet/fn.propose_transfer.html) can return multiple dependent transactions and lock inputs; use the behavior of the version actually pinned by the project.
+
+## Sources
+
+Last verified: 2026-11-26.
+
+- [ZIP 317](https://zips.z.cash/zip-0317): "[Revision 0] Active, [Revision 1: NU6.3] Active, [Revision 2] Proposed"
+- [ZIP 2009](https://zips.z.cash/zip-2009) (Proposed), [ZIP 218](https://zips.z.cash/zip-0218) (Final): default expiry 120 blocks from NU7 activation
+- [ZIP 259](https://zips.z.cash/zip-0259) (Final): NU7 activated on Mainnet at height 3543405

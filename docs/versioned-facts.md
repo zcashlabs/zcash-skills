@@ -10,37 +10,39 @@ file whose match text differs from `value`.
 
 | Fact | Value | Verified | Source |
 | --- | --- | --- | --- |
-| Current deployed upgrade | NU6.3 (Ironwood, v6 tx format) | 2026-10-06 | [ZIP 258](https://zips.z.cash/zip-0258) |
-| NU7 status | Draft; Testnet activation height 4,465,026 (2026-10-06); Mainnet height assigned 2026-10-20, activation target 2026-11-05 | 2026-10-06 | [ZIP 259](https://zips.z.cash/zip-0259) |
-| NU7 consensus branch ID | `0x77190AD9` | 2026-10-06 | ZIP 259 |
-| NU7 min network protocol version | Testnet `170180` / Mainnet `170190` | 2026-10-06 | ZIP 259 |
-| NU7 block spacing / shielded action limits | 25 s; global 330, Orchard 330, Ironwood 330, Sapling 300 I/O, Sprout 0 | 2026-10-06 | [ZIP 218](https://zips.z.cash/zip-0218) |
-| NU7 default expiry delta guidance | 120 blocks (was 40; ~50 min wall-clock) — non-consensus | 2026-10-06 | ZIP 218 |
-| NU6.3 activation heights | Mainnet 3,428,143; Testnet 4,134,000 | 2026-10-08 | ZIP 258 |
-| NU6.3 consensus branch ID | `0x37A5165B` | 2026-10-08 | ZIP 258 |
-| NU6.3 min network protocol version | `170160` (both networks — last shared value; ZIP 204 requires distinct from NU7) | 2026-10-08 | ZIP 258 |
-| ZIP 316 (Unified Addresses) | Revision 0 active; Revision 1 withdrawn; Revision 2 draft | 2026-10-08 | [ZIP 316](https://zips.z.cash/zip-0316) |
-| ZIP 317 (conventional fee) | Rev 0 active; Rev 1 (Ironwood contribution) enacted at NU6.3; Rev 2 draft | 2026-10-06 | [ZIP 317](https://zips.z.cash/zip-0317) |
-| ZIP 320 (TEX addresses) | Active; `tex`/`textest` HRP, Bech32m P2PKH re-encode | 2026-10-06 | [ZIP 320](https://zips.z.cash/zip-0320) |
-| ZIP 321 (payment URIs) | Active | 2026-10-06 | [ZIP 321](https://zips.z.cash/zip-0321) |
+| Current deployed upgrade | NU7 (settled on Mainnet; activated at height 3,543,405 on 2026-11-06 02:34 UTC) | 2026-11-26 | [zcash/zips README.rst](https://github.com/zcash/zips/blob/main/README.rst) "Settled Mainnet Network Upgrade", [ZIP 259](https://zips.z.cash/zip-0259) |
+| NU7 status | Final; activation heights Testnet 4,465,026, Mainnet 3,543,405; `NSM_REISSUANCE_HEIGHT` Testnet 7,305,222, Mainnet 8,939,664 | 2026-11-26 | [ZIP 259](https://zips.z.cash/zip-0259) |
+| NU7 transaction versions / Sprout | v4 invalid from NU7, v5 and v6 valid; Sprout funds unspendable (not burned; "may never be re-enabled") | 2026-11-26 | [ZIP 2003](https://zips.z.cash/zip-2003), ZIP 259 |
+| NU7 consensus branch ID | `0x77190AD9` | 2026-11-26 | ZIP 259 |
+| NU7 min network protocol version | Testnet `170180` / Mainnet `170190` | 2026-11-26 | ZIP 259 |
+| NU7 block spacing / shielded action limits | 25 s; global 330, Orchard 330, Ironwood 330, Sapling 300 I/O, Sprout 0 | 2026-11-26 | [ZIP 218](https://zips.z.cash/zip-0218) (Final) |
+| NU7 default expiry delta guidance | 120 blocks (was 40; ~50 min wall-clock) — non-consensus | 2026-11-26 | ZIP 218 |
+| NU6.3 activation heights | Mainnet 3,428,143; Testnet 4,134,000 | 2026-11-26 | ZIP 258 (Final) |
+| NU6.3 consensus branch ID | `0x37A5165B` | 2026-11-26 | ZIP 258 |
+| NU6.3 min network protocol version | `170160` (both networks — last shared value; ZIP 204 requires distinct from NU7) | 2026-11-26 | ZIP 258 |
+| ZIP 316 (Unified Addresses) | Revision 0 active; Revision 1 withdrawn; Revision 2 draft | 2026-11-26 | [ZIP 316](https://zips.z.cash/zip-0316) |
+| ZIP 317 (conventional fee) | Rev 0 active; Rev 1 (Ironwood contribution) active, enacted at NU6.3; Rev 2 Proposed (ZIP 2009: `marginal_fee` 5,000 → 1,000, `weight_ratio_cap` 4 → 10) | 2026-11-26 | [ZIP 317](https://zips.z.cash/zip-0317) |
+| ZIP 320 (TEX addresses) | Active; `tex`/`textest` HRP, Bech32m P2PKH re-encode | 2026-11-26 | [ZIP 320](https://zips.z.cash/zip-0320) |
+| ZIP 321 (payment URIs) | Active | 2026-11-26 | [ZIP 321](https://zips.z.cash/zip-0321) |
 
 ## Thus Spoke Zakura (`zcashlabs/thus-spoke-zakura`)
 
 | Fact | Value | Verified | Source |
 | --- | --- | --- | --- |
-| Workspace version | `0.4.1` | 2026-10-27 | `Cargo.toml` |
+| Workspace version | `0.5.0` | 2026-11-26 | `Cargo.toml` |
+| Default runtime | native since v0.5.0; `start --docker` for Docker images; source builds need `build --dev` + `start --docker` or `--runtime-dir` | 2026-11-26 | `AGENTS.md`, `CHANGELOG.md` |
 | Packages / binary | `ths-cli`, `ths-server`; package `thus-spoke-zakura`, binary `ths` | 2026-10-02 | `Cargo.toml` |
 | Rust toolchain | `1.98.0` (`rust-toolchain.toml`); Node `24` for `web/` | 2026-10-02 | `rust-toolchain.toml`, `ci.yml` |
-| Pinned node image | `zakuracore/zakura:1.7.0` (`ZAKURA_IMAGE` in `runtime/images.rs`) | 2026-10-27 | `crates/ths-cli/src/runtime/images.rs` |
-| zcashd-compat sidecar image | `zakuracore/zcashd` — current docs tag `v1.2.0` (zcashd-versioned, independent of Zakura tags) | 2026-10-08 | `zakura` repo `docs/zcashd-compat.md` |
+| Pinned node image | `zakuracore/zakura:1.7.0` (`ZAKURA_IMAGE` in `runtime/images.rs`, Docker runtime); native bundle builds `zakurad` from `zakura_commit` `c572f8faf88e58dcaefd80ec8e4ed05f2d8643b6`, the Zakura `v1.7.0` tag commit | 2026-11-26 | `crates/ths-cli/src/runtime/images.rs`, `native/runtime.json` |
+| zcashd-compat sidecar image | `zakuracore/zcashd` — current docs tag `v1.3.1` (schedules Mainnet NU7; `v1.2.0` is Testnet-only for NU7; zcashd-versioned, independent of Zakura tags) | 2026-11-26 | `zakura` repo `docs/zcashd-compat.md` |
 | App / lightwalletd images | `ghcr.io/zcashlabs/thus-spoke-zakura-app`, `-lightwalletd` | 2026-10-16 | `crates/ths-cli/src/runtime/images.rs`, `release.yml` |
-| Wallet crate pins | `zakura-{keys,primitives,proofs,orchard,sapling-crypto,transparent,zip321} = 2.2.0`; `zakura-client-{backend,sqlite} = 0.1.0-rc7`; `zakura-pczt = 0.1.0-rc4`; imported under `zcash_*` aliases | 2026-10-08 | `crates/ths-server/Cargo.toml` |
+| Wallet crate pins | `zakura-{keys,primitives,proofs,orchard,sapling-crypto,transparent,zip321} = 4.0.0`; `zakura-client-{backend,sqlite} = 0.1.0-rc9.4`; no direct `zakura-pczt` pin (PCZT via the `zakura-primitives` `pczt` feature); imported under `zcash_*` aliases. Upstream pins, not crates.io latest | 2026-11-26 | `crates/ths-server/Cargo.toml` |
 | Account layout | accounts `1..=5` user-facing; account `6` treasury/miner | 2026-10-02 | `db.rs` |
 | Default loopback ports | dashboard `32805`, RPC `18232`, lightwalletd `9067`, P2P `18233` (+offset stride 10) | 2026-10-16 | `crates/ths-cli/src/runtime/instance.rs` |
 | Shielded pool | Ironwood; `orchard` rejected as destination pool post-NU6.3 | 2026-10-02 | `crates/ths-server/src/api/payments.rs`, `wallet/payments.rs` |
 | Wallet DB schema names | `ext_tsz_*` — intentionally kept for migration stability despite the crate rename | 2026-10-16 | `crates/ths-server/src/wallet/journal.rs`, `wallet/recovery.rs` |
 | Dev API env var | `THS_DEV_API` (not `TSZ_DEV_API`) | 2026-10-02 | `AGENTS.md` |
-| Regtest NU activation | NU6–NU6.3 at height 1 in generated `zakurad.toml`; `regtest_network().nu7 = None` | 2026-10-06 | `crates/ths-server/src/bootstrap/config.rs`, `wallet.rs` |
+| Regtest NU activation | NU5–NU6.3 at height 1 in generated `zakurad.toml`; NU7 at the instance's stored height (`DEFAULT_NU7_ACTIVATION_HEIGHT = 1`, `ths start --nu7-height`), mirrored by `regtest_network_with_nu7` | 2026-11-26 | `crates/ths-server/src/bootstrap/config.rs`, `network.rs` |
 | Address-faucet idempotency | `faucet_address` requires a key; `claim_address_faucet` persists to `address_faucets`; replay resumes the operation; `activities`/`address_faucets` share one key space (`IdempotencyConflict`) | 2026-10-16 | `crates/ths-server/src/api/payments.rs`, `db/address_faucet.rs`, `db/activity.rs`, `payments/progression.rs` |
 | Address-faucet replay tests | `confirmed_address_faucet_replays_without_sending_a_second_payment`, `address_faucet_replay_survives_restart_and_rejects_conflicting_intents`, `address_faucet_reconciles_the_original_txid_after_a_lost_broadcast_response` | 2026-10-16 | `crates/ths-server/tests/unit/api/payments/tests.rs`, `tests/unit/db/address_faucet/tests.rs`, `tests/unit/payments/submission/tests.rs`; pair legacy adapter tests with production progression tests |
 | CI live cases | `activity_recovery` selects seven: `broadcast_recovers_after_auto_mine_failure`, `concurrent_identical_sends_have_one_chain_effect`, `address_faucet_retry_after_server_restart_pays_each_destination_once`, `queued_send_retry_survives_lost_response_and_restart`, `queued_external_faucet_retry_survives_lost_response_and_restart`, `reorg_and_rollback_preserve_canonical_wallet_and_payment_state`, `external_ironwood_memo_is_recovered_by_receiving_wallet_sync`; the 10k-block workload is not selected | 2026-10-27 | `.github/workflows/ci.yml` |
@@ -51,17 +53,22 @@ file whose match text differs from `value`.
 
 | Fact | Value | Verified | Source |
 | --- | --- | --- | --- |
-| Package | `@zcashlabs/zcash.js` version `0.1.1` | 2026-10-27 | `package.json`, npm `latest` |
-| Node engine | `22.23.4` (exact pin; Brotli security update) | 2026-10-27 | `package.json` `engines`, `CHANGELOG.md` |
-| Bundled consensus | `zcash_protocol` `0.10.6`; presets carry genesis + activation through NU6.3 | 2026-10-27 | `docs/api/networks-amounts.md` |
+| Package | `@zcashlabs/zcash.js` version `0.1.4` | 2026-11-26 | `package.json`, npm `latest` |
+| Node engine | `22.23.4` (exact pin; Brotli security update) | 2026-11-26 | `package.json` `engines`, `CHANGELOG.md` |
+| Bundled consensus | `zcash_protocol` `0.10.6` through NU6.3; presets carry genesis + activation through NU7 (mainnet 3543405, testnet 4465026) as version-2 documents | 2026-11-26 | `docs/api/networks-amounts.md` |
 
-## Sprout→Sapling migration tool (zcashd docs)
+## Sprout→Sapling migration tool (zcashd docs, historical)
+
+The tool no longer has a live use: zcashd halted at block 3,417,100 on 2026-07-18
+([end-of-life notice](https://zcash.github.io/zcash/user/end-of-life.html)), and
+from NU7 Sprout funds are unspendable (ZIP 2003). The rows record what the doc
+says, for reading old migration output.
 
 | Fact | Value | Verified | Source |
 | --- | --- | --- | --- |
-| Available since | zcashd `2.0.5-2` | 2026-10-28 | [Sprout-to-Sapling Migration](https://zcash.readthedocs.io/en/master/rtd_pages/sapling_turnstile.html) |
-| Batch cadence | up to 5 transactions whenever the blockchain reaches a 500-block-height interval | 2026-10-28 | same page |
-| End condition | auto-disables when the wallet's Sprout balance falls below 0.01 ZEC | 2026-10-28 | same page |
+| Available since | zcashd `2.0.5-2` | 2026-11-26 | [Sprout-to-Sapling Migration](https://zcash.readthedocs.io/en/master/rtd_pages/sapling_turnstile.html) |
+| Batch cadence | up to 5 transactions whenever the blockchain reaches a 500-block-height interval | 2026-11-26 | same page |
+| End condition | auto-disables when the wallet's Sprout balance falls below 0.01 ZEC | 2026-11-26 | same page |
 
 ## Machine-checkable facts
 
@@ -146,7 +153,7 @@ extract: ^pub\(crate\) async fn (payment_confirmation_loop)\(
 id: zakura-image
 value: zakuracore/zakura:1.7.0
 pattern: zakuracore/zakura:[0-9a-zA-Z.\-]+
-verified: 2026-10-27
+verified: 2026-11-26
 source: crates/ths-cli/src/runtime/images.rs (ZAKURA_IMAGE)
 upstream: https://raw.githubusercontent.com/zcashlabs/thus-spoke-zakura/main/crates/ths-cli/src/runtime/images.rs
 extract: const ZAKURA_IMAGE: &str = "([^"]+)"
@@ -166,17 +173,27 @@ extract: ^channel = "([^"]+)"
 id: nu7-testnet-height
 value: 4,465,026
 pattern: 4,?465,?026|NU7[^\n]{0,40}Testnet[^\n]{0,40}[0-9][0-9,]{5,}[0-9]
-verified: 2026-10-06
+verified: 2026-11-26
 source: ZIP 259
 upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0259.md
 extract: ^ACTIVATION_HEIGHT \(NU7\)\n: Testnet: ([0-9]+)
 ```
 
 ```facts
+id: nu7-mainnet-height
+value: 3,543,405
+pattern: 3,?543,?405|NU7[^\n]{0,40}Mainnet[^\n]{0,40}height[^\n]{0,4}[0-9][0-9,]{5,}[0-9]
+verified: 2026-11-26
+source: ZIP 259 (Final); zcash/zips README.rst "Settled Mainnet Network Upgrade"
+upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0259.md
+extract: ^ACTIVATION_HEIGHT \(NU7\)\n: Testnet: [0-9]+\n: Mainnet: ([0-9]+)
+```
+
+```facts
 id: nu7-branch-id
 value: 0x77190AD9
 pattern: 0x77190AD9
-verified: 2026-10-09
+verified: 2026-11-26
 source: ZIP 259
 upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0259.md
 extract: ^CONSENSUS_BRANCH_ID\n: `?(0x[0-9A-Fa-f]{8})
@@ -186,7 +203,7 @@ extract: ^CONSENSUS_BRANCH_ID\n: `?(0x[0-9A-Fa-f]{8})
 id: nu63-branch-id
 value: 0x37A5165B
 pattern: 0x37A5165B
-verified: 2026-10-09
+verified: 2026-11-26
 source: ZIP 258
 upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0258.md
 extract: ^CONSENSUS_BRANCH_ID\n: `?(0x[0-9A-Fa-f]{8})
@@ -195,7 +212,7 @@ extract: ^CONSENSUS_BRANCH_ID\n: `?(0x[0-9A-Fa-f]{8})
 ```facts
 id: nu63-mainnet-height
 value: 3,428,143
-verified: 2026-10-09
+verified: 2026-11-26
 source: ZIP 258
 upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0258.md
 extract: ^ACTIVATION_HEIGHT \(NU6\.3\)\n: Testnet: [0-9]+\n: Mainnet: ([0-9]+)
@@ -203,8 +220,8 @@ extract: ^ACTIVATION_HEIGHT \(NU6\.3\)\n: Testnet: [0-9]+\n: Mainnet: ([0-9]+)
 
 ```facts
 id: ths-workspace-version
-value: 0.4.1
-verified: 2026-10-27
+value: 0.5.0
+verified: 2026-11-26
 source: Cargo.toml ([workspace.package])
 upstream: https://raw.githubusercontent.com/zcashlabs/thus-spoke-zakura/main/Cargo.toml
 extract: ^\[workspace\.package\]\n(?:.*\n)*?version = "([^"]+)"
@@ -247,7 +264,7 @@ source: ZIP 317 — the proportional fee is a wallet convention, not a consensus
 id: zip320-tex-fixture
 value: t1VmmGiyjVNeCjxDZzg7vZmd99WyzVby9yC
 pattern: t1VmmGiyjVNeCjxDZzg7vZmd99WyzVby9yC
-verified: 2026-10-12
+verified: 2026-11-26
 source: ZIP 320 reference implementation — transparent P2PKH fixture address (rst oracle coverage)
 upstream: https://raw.githubusercontent.com/zcash/zips/main/zips/zip-0320.rst
 extract: bs58check\.decode\('([^']+)'\)
@@ -255,9 +272,9 @@ extract: bs58check\.decode\('([^']+)'\)
 
 ```facts
 id: zcashjs-version
-value: 0.1.1
+value: 0.1.4
 pattern: zcashjs.{0,3}v?[0-9]+\.[0-9]+\.[0-9]+
-verified: 2026-10-27
+verified: 2026-11-26
 source: package.json + npm `latest` — @zcashlabs/zcash.js published version
 upstream: https://raw.githubusercontent.com/zcashlabs/zcashjs/main/package.json
 extract: "version":\s*"([0-9]+\.[0-9]+\.[0-9]+)"
@@ -267,7 +284,7 @@ extract: "version":\s*"([0-9]+\.[0-9]+\.[0-9]+)"
 id: zcashjs-node-engine
 value: 22.23.4
 pattern: [Nn]ode.{0,10}22\.23\.[0-9]+
-verified: 2026-10-27
+verified: 2026-11-26
 source: package.json `engines.node` exact pin + CHANGELOG (Brotli security update)
 upstream: https://raw.githubusercontent.com/zcashlabs/zcashjs/main/package.json
 extract: "node":\s*"([0-9]+\.[0-9]+\.[0-9]+)"
@@ -277,7 +294,7 @@ extract: "node":\s*"([0-9]+\.[0-9]+\.[0-9]+)"
 id: zcashjs-protocol-crate
 value: 0.10.6
 pattern: zcash_protocol.{0,5}[0-9]+\.[0-9]+\.[0-9]+
-verified: 2026-10-27
+verified: 2026-11-26
 source: docs/api/networks-amounts.md — preset activation maps match bundled zcash_protocol
 upstream: https://raw.githubusercontent.com/zcashlabs/zcashjs/main/docs/api/networks-amounts.md
 extract: zcash_protocol.{0,4}?([0-9]+\.[0-9]+\.[0-9]+)
@@ -287,7 +304,7 @@ extract: zcash_protocol.{0,4}?([0-9]+\.[0-9]+\.[0-9]+)
 id: sprout-migration-since
 value: 2.0.5-2
 pattern: since zcashd (?:\*\*)?[0-9]+\.[0-9]+\.[0-9]+-[0-9]+|zcashd ≥ ?[0-9]+\.[0-9]+\.[0-9]+-[0-9]+
-verified: 2026-10-28
+verified: 2026-11-26
 source: zcashd docs — "As of version 2.0.5-2 of zcashd" the tool is available
 upstream: https://zcash.readthedocs.io/en/master/rtd_pages/sapling_turnstile.html
 extract: As of version ([0-9.\-]+)
@@ -297,7 +314,7 @@ extract: As of version ([0-9.\-]+)
 id: sprout-migration-interval
 value: 500
 pattern: [0-9]+[- ]block[- ]height interval
-verified: 2026-10-28
+verified: 2026-11-26
 source: zcashd docs — batches "whenever the blockchain reaches a 500 block height interval"
 upstream: https://zcash.readthedocs.io/en/master/rtd_pages/sapling_turnstile.html
 extract: ([0-9]+) block height interval
@@ -307,7 +324,7 @@ extract: ([0-9]+) block height interval
 id: sprout-migration-batch-cap
 value: 5
 pattern: up to [0-9]+ transactions
-verified: 2026-10-28
+verified: 2026-11-26
 source: zcashd docs — "creating up to 5 transactions" per interval
 upstream: https://zcash.readthedocs.io/en/master/rtd_pages/sapling_turnstile.html
 extract: up to ([0-9]+) transactions

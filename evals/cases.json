@@ -213,7 +213,7 @@
     },
     {
       "id": "route-15",
-      "prompt": "A user pasted their seed phrase into chat and asked me to handle their Sprout migration before NU7. Write the response.",
+      "prompt": "A user pasted their seed phrase into chat and asked me to move their Sprout funds now that NU7 is live. Write the response.",
       "required": [
         "sprout-rescue"
       ],
@@ -226,7 +226,7 @@
     },
     {
       "id": "route-16",
-      "prompt": "A user tried z_sendmany from their Sprout address to a Sapling address and it was rejected. Explain why, and what the recommended migration path does differently.",
+      "prompt": "A user says z_sendmany from their Sprout address to a Sapling address was rejected years ago, and asks whether the old migration tool or anything else can move those funds today. Explain.",
       "required": [
         "sprout-rescue"
       ],
@@ -240,7 +240,7 @@
     },
     {
       "id": "route-17",
-      "prompt": "z_setmigration was running but the zcashd node restarted and migration stopped progressing. What does the zcashd migration doc say about restart and reactivation behavior?",
+      "prompt": "z_setmigration was running on a zcashd node that has now shut down and will not restart. What happened, and what can the user do about the Sprout balance that was not migrated?",
       "required": [
         "sprout-rescue"
       ],

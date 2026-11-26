@@ -16,7 +16,7 @@ Keep accounts 1–5 user-facing and account 6 internal. Preserve the wallet snap
 1. Locate the owning step in RPC, lightwalletd download, wallet SDK, local store, snapshot, or API.
 2. Follow a normal request and its hardest failure path, including retry after a persisted or broadcast effect.
 3. Choose the nearest existing test seam and assert the consequential wallet, activity, and chain state.
-4. For edited server code, run `cargo run -p thus-spoke-zakura -- build --dev` and start a new named instance. Vite's `THS_DEV_API` frontend mode still calls the existing server. Report which binary/image the evidence exercised.
+4. For edited server code, run `cargo run -p thus-spoke-zakura -- build --dev` and start a new named instance with `start --docker`. Vite's `THS_DEV_API` frontend mode still calls the existing server. Report which binary/image the evidence exercised.
 
 ## Review examples
 

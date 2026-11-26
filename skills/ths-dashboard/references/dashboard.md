@@ -30,7 +30,7 @@ The SSE endpoint emits topics without event IDs or replay. If a connection drops
 
 ## Stale balance diagnosis
 
-1. Record source revision, running app image identity, instance, and `ths endpoints` output before changing state. After server edits, run `cargo run -p thus-spoke-zakura -- build --dev`, then start a **new named instance** using the rebuilt image. A build does not replace an existing container. Preserve the old instance and wallet store while collecting failure evidence.
+1. Record source revision, running app image identity, instance, and `ths endpoints` output before changing state. After server edits, run `cargo run -p thus-spoke-zakura -- build --dev`, then start a **new named instance** using the rebuilt image (`start --docker`; the default runtime is native since v0.5.0). A build does not replace an existing container. Preserve the old instance and wallet store while collecting failure evidence.
 2. For frontend work, `THS_DEV_API=<dashboard-url> npm run dev --prefix web` runs Vite with `/api` proxied to the existing instance. It updates frontend code only; it does not rebuild or replace that instance's server. Verify `web/vite.config.ts` and the chosen API target.
 3. Compare raw `/api/v1/status` and `/api/v1/accounts` with node height and hash. Inspect sync state, last error, and last success; `/api/v1/health` may remain 200 after an earlier successful sync. If accounts are already stale over HTTP, follow [snapshot publication](../../ths-wallet-server/references/wallet-server.md#sync-and-balance-publication).
 4. If HTTP accounts are current, trace `web/src/hooks/queries.ts::useAccounts` → `queryKeys.accounts` → `api.accounts` and its Zod validation into `WalletPage`. Compare the response, cached data, query update time, and rendered values. Check the `wallet` event and exact key refetch; `chain` and `sync` alone do not refresh accounts.
@@ -66,3 +66,11 @@ npm test --prefix web -- src/features/explorer/TransactionDetail.test.tsx
 ```
 
 These are nearby tests, not a substitute for a new event-invalidation or supply-precision case. Run all web checks from `AGENTS.md` after editing `web/`.
+
+## Sources
+
+Last verified: 2026-11-26, for the runtime-mode and wallet-crate statements only; the source map keeps its own checked date.
+
+- THS `AGENTS.md`: "`ths` runs prebuilt Docker images or native bundles"; rebuild with `build --dev`, then `start --docker`
+- THS `CHANGELOG.md` v0.5.0: native runtime by default, Zakura Common 4.0.0, backend/SQLite 0.1.0-rc9.4, `--nu7-height`
+- THS `crates/ths-server/Cargo.toml`

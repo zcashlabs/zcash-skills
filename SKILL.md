@@ -5,11 +5,12 @@ description: Use when a request involves Zcash, ZEC, shielded transactions, Unif
 
 # zcashskills — the missing knowledge between AI agents and production Zcash.
 
-You are probably wrong about Zcash's current state. `zcashd` is deprecated, ECC
-is now ZODL, Orchard is sealed (spend-only since NU6.3), shielded funds land in
-the **Ironwood** pool, and NU6.3 permits transaction versions 4, 5, and 6 —
-only v6 carries Ironwood outputs, and v4 dies with NU7. This file routes you to
-the correction you need.
+You are probably wrong about Zcash's current state. `zcashd` is deprecated and
+halted before NU6.3, ECC's Zcash team is now ZODL, Orchard is sealed (spend-only
+since NU6.3), shielded funds land in the **Ironwood** pool, and NU7 is live on
+Mainnet (height 3,543,405, 2026-11-06): 25-second blocks, only v5 and v6
+transactions, and Sprout funds unspendable. This file routes you to the
+correction you need.
 
 ---
 
@@ -62,6 +63,8 @@ Sync, birthdays, commitment trees, reorgs.
 Consensus rules, activation boundaries, encodings, verification.
 - NU6.3 sealed the Orchard pool (no new value in; cross-address transfers off)
   and added the Ironwood pool + v6 transactions (ZIPs 258, 229, 2005).
+- NU7 (ZIP 259) made v4 invalid (ZIP 2003) and cut block spacing to 25 s
+  (ZIP 218); a transaction signed before activation is invalid after it.
 - Test rule changes at `H-1`, `H`, `H+1`; use zcash-test-vectors for encodings.
 
 ### [zcashjs](skills/zcashjs/SKILL.md)
@@ -74,13 +77,11 @@ The `@zcashlabs/zcash.js` TypeScript SDK for Node and browsers.
   plus deployed lazy WASM/worker/proving assets.
 
 ### [sprout-rescue](skills/sprout-rescue/SKILL.md)
-The zcashd Sprout→Sapling migration tool (`z_setmigration` since 2.0.5-2).
-- Never handle wallet.dat, seeds, keys, or passphrases — the user types
+Sprout holders after NU7, and the historical zcashd migration tool.
+- Never handle wallet.dat, seeds, keys, or passphrases. The user types
   secrets in their own terminal; unsolicited "recovery services" are scams.
-- Sprout→Sapling always crosses the transparent pool; the tool hides each
-  migration among concurrent ones, it does not make it invisible.
-- `z_setmigration` does not survive a restart unless `-migration` is set —
-  and with the flag set, restart re-enables it even after `z_setmigration false`.
+- Since NU7, Sprout funds are unspendable (ZIP 2003); zcashd has halted and
+  Zallet does not import Sprout keys, so keep `wallet.dat` backups offline.
 
 ### [zakura](skills/zakura/SKILL.md)
 The Zakura full node — a Zebra fork built for scale.
@@ -93,10 +94,11 @@ Thus Spoke Zakura: disposable Regtest stack — Zakura node + lightwalletd +
 `ths-server` + React dashboard, launched by the `ths` CLI.
 - Regtest-only, loopback-only. Accounts 1–5 are users; account 6 is the
   mining/faucet treasury and stays hidden.
-- `ths` runs prebuilt images — source edits need `build --dev` first.
+- `ths` runs prebuilt Docker images or native bundles. Source edits need
+  `build --dev` and `start --docker` (or `--runtime-dir` for a native bundle).
 
 ### [ths-runtime](skills/ths-runtime/SKILL.md)
-CLI commands, Docker instance lifecycle, cleanup ownership, endpoints.
+CLI commands, instance lifecycle (native or Docker), cleanup ownership, endpoints.
 
 ### [ths-wallet-server](skills/ths-wallet-server/SKILL.md)
 Wallet sync, treasury reward discovery, send/faucet idempotency, snapshots.

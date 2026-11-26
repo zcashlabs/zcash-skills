@@ -24,7 +24,7 @@ Keep consensus validity distinct from node mempool policy and wallet constructio
 - For expiry height `N`, check block validity at `N` and `N+1`; do not use mempool rejection as the consensus oracle.
 - For a fee dispute, identify whether the claim comes from ZIP 317 wallet guidance, node relay policy, or an actual block-validity rule.
 - For an Orchard-pool claim post-NU6.3, name whether it is a spend (allowed, with `enableCrossAddress` off), a change note, or a new output (forbidden — that output belongs to Ironwood).
-- For a NU7 rehearsal on Regtest, assign the upgrade a deferred activation height in the node's regtest parameters and verify the wallet's activation map matches — wallet and node disagreeing about `nu7` is a real failure mode.
-- For the wallet-side mechanics of moving value across the Sprout→Sapling boundary (`z_setmigration`, the transparent-pool passthrough), load [sprout-rescue](../sprout-rescue/SKILL.md); this skill covers the consensus rule, that one covers the operator runbook.
+- NU7 is active on Mainnet and Testnet (ZIP 259). For a NU7 boundary rehearsal on Regtest, assign the upgrade a deferred activation height in the node's regtest parameters and verify the wallet's activation map matches — wallet and node disagreeing about `nu7` is a real failure mode.
+- For a Sprout holder (funds unspendable since NU7's v4 ban, the historical `z_setmigration` tool), load [sprout-rescue](../sprout-rescue/SKILL.md); this skill covers the consensus rule, that one covers the holder's situation.
 
 Report the governing document revision, target network and height, exact bytes or vector, code path reached, and which layer accepted or rejected it.
