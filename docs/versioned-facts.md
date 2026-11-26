@@ -33,7 +33,7 @@ file whose match text differs from `value`.
 | Default runtime | native since v0.5.0; `start --docker` for Docker images; source builds need `build --dev` + `start --docker` or `--runtime-dir` | 2026-11-26 | `AGENTS.md`, `CHANGELOG.md` |
 | Packages / binary | `ths-cli`, `ths-server`; package `thus-spoke-zakura`, binary `ths` | 2026-10-02 | `Cargo.toml` |
 | Rust toolchain | `1.98.0` (`rust-toolchain.toml`); Node `24` for `web/` | 2026-10-02 | `rust-toolchain.toml`, `ci.yml` |
-| Pinned node image | `zakuracore/zakura:1.7.0` (`ZAKURA_IMAGE` in `runtime/images.rs`) | 2026-11-26 | `crates/ths-cli/src/runtime/images.rs` |
+| Pinned node image | `zakuracore/zakura:1.7.0` (`ZAKURA_IMAGE` in `runtime/images.rs`, Docker runtime); native bundle builds `zakurad` from `zakura_commit` `c572f8faf88e58dcaefd80ec8e4ed05f2d8643b6`, the Zakura `v1.7.0` tag commit | 2026-11-26 | `crates/ths-cli/src/runtime/images.rs`, `native/runtime.json` |
 | zcashd-compat sidecar image | `zakuracore/zcashd` — current docs tag `v1.3.1` (schedules Mainnet NU7; `v1.2.0` is Testnet-only for NU7; zcashd-versioned, independent of Zakura tags) | 2026-11-26 | `zakura` repo `docs/zcashd-compat.md` |
 | App / lightwalletd images | `ghcr.io/zcashlabs/thus-spoke-zakura-app`, `-lightwalletd` | 2026-10-16 | `crates/ths-cli/src/runtime/images.rs`, `release.yml` |
 | Wallet crate pins | `zakura-{keys,primitives,proofs,orchard,sapling-crypto,transparent,zip321} = 4.0.0`; `zakura-client-{backend,sqlite} = 0.1.0-rc9.4`; no direct `zakura-pczt` pin (PCZT via the `zakura-primitives` `pczt` feature); imported under `zcash_*` aliases. Upstream pins, not crates.io latest | 2026-11-26 | `crates/ths-server/Cargo.toml` |
